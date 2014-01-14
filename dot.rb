@@ -79,7 +79,6 @@ def draw_vertical_rule (box, color, weight, space, debug = false)
 	end
 end
 
-
 def draw_grid (box, color, weight, space, debug = false)
 	# redefining box size to make sure all sides are closed, and use horizontal_rule and vertical_rule to actually draw the lines
 	b = Hash.new
@@ -91,6 +90,40 @@ def draw_grid (box, color, weight, space, debug = false)
 	draw_vertical_rule b, color, weight, space, debug
 end
 
+# generate dots in equilateral triangle with height = space
+def draw_vertical_tri_dots (box, color, weight, space, debug = false)
+    v_space = space / Math.tan(Math::PI/3) * 2
+    odd = true
+	x = box[:min_x]
+	while x <= box[:max_x] do
+		y = odd ? box[:min_y] : box[:min_y] + v_space / 2
+		odd = !odd
+		while y <= box[:max_y] do
+			fill_color color
+			fill_circle [x, y], weight
+			p "dot [#{x}, #{y}]" if debug
+			y += space
+		end
+		x += v_space
+	end
+end
+
+def draw_horizontal_tri_dots (box, color, weight, space, debug = false)
+    h_space = space / Math.tan(Math::PI/3) * 2
+    odd = true
+	y = box[:min_y]
+	while y <= box[:max_y] do
+		x = odd ? box[:min_x] : box[:min_x] + h_space / 2
+		odd = !odd
+		while x <= box[:max_x] do
+			fill_color color
+			fill_circle [x, y], weight
+			p "dot [#{x}, #{y}]" if debug
+			x += space
+		end
+		y += h_space
+	end
+end
 def n_up_horizontal_rule(file_name, horizontal = 1, vertical = 2, page_width = 612, page_height = 792, margin = 72/4, pages = 1, line_width = 0.75, space = 13.5, color = "DDDDDD", debug = false) 
 	n_up file_name, page_width, page_height, margin, pages, horizontal, vertical, line_width, space, color, :draw_horizontal_rule, debug
 end
@@ -107,8 +140,18 @@ def n_up_dots(file_name, horizontal = 1, vertical = 2, page_width = 612, page_he
 	n_up file_name, page_width, page_height, margin, pages, horizontal, vertical, radius, space, color, :draw_dots, debug
 end
 
+def n_up_vertical_tri_dots(file_name, horizontal = 1, vertical = 2, page_width = 612, page_height = 792, margin = 72/4, pages = 1, radius = 0.75, space = 13.5, color = "DDDDDD", debug = false) 
+	n_up file_name, page_width, page_height, margin, pages, horizontal, vertical, radius, space, color, :draw_vertical_tri_dots, debug
+end
+
+def n_up_horizontal_tri_dots(file_name, horizontal = 1, vertical = 2, page_width = 612, page_height = 792, margin = 72/4, pages = 1, radius = 0.75, space = 13.5, color = "DDDDDD", debug = false) 
+	n_up file_name, page_width, page_height, margin, pages, horizontal, vertical, radius, space, color, :draw_horizontal_tri_dots, debug
+end
+
 n_up_dots "2updots.pdf"
 n_up_horizontal_rule "2uphlines.pdf"
 n_up_dots "4updots.pdf", 2, 2
 n_up_vertical_rule "2upvlines.pdf"
 n_up_grid "2upgrid.pdf"
+n_up_horizontal_tri_dots "2uphtridots.pdf"
+n_up_vertical_tri_dots "2upvtridots.pdf"

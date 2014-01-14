@@ -132,35 +132,105 @@ end
 
 # generate dots in periods
 def draw_horizontal_fib_dots (box, color, weight, space, debug = false)
-	n1 = 0
-	n2 = 1
+	n1 = 1
+	n2 = 2
 	bound_width = box[:max_x] - box[:min_x]
-
+	grow = true
 	y = box[:min_y]
+
+	# grow the sequence to a reasonable size for asethetics
+	while bound_width * 1.0 / (n2 - 1) > 6 * space
+		t = n1
+		n1 = n2
+		n2 = n1 + t
+	end
+
+	min_n1 = n1
+
 	while y <= box[:max_y] do
-		x = 0
+		x = box[:min_x]
 
-		do
-			line_space = bound_width / n2
-			if line_space < space then
-				n1 = 0
-				n2 = 1
-			end
-		end
+		line_space = bound_width * 1.0 / (n2 - 1)
 
-		while x <= box[:max_x] do
+		while x < box[:max_x] do
 			fill_color color
 			fill_circle [x, y], weight
 			p "dot [#{x}, #{y}]" if debug
 			x += line_space
 		end
-		t = n1
-		n1 = n2
-		n2 = n1 + t
+
+		fill_color color
+		fill_circle [box[:max_x], y], weight
+		p "dot [#{box[:max_x]}, #{y}]" if debug
+
+		if grow and bound_width * 1.0 / (n1 + n2 - 1) < space then
+			grow = false
+		elsif !grow and n1 == min_n1 then
+			grow = true
+		end
+
+		if grow then
+			t = n1
+			n1 = n2
+			n2 = n1 + t
+		else
+			t = n2
+			n2 = n1
+			n1 = t - n2
+		end
 		y += space
 	end
 end
 
+def draw_vertical_fib_dots (box, color, weight, space, debug = false)
+	n1 = 1
+	n2 = 2
+	bound_height = box[:max_y] - box[:min_y]
+	grow = true
+	x = box[:min_x]
+
+	# grow the sequence to a reasonable size for asethetics
+	while bound_height * 1.0 / (n2 - 1) > 6 * space
+		t = n1
+		n1 = n2
+		n2 = n1 + t
+	end
+
+	min_n1 = n1
+	while x <= box[:max_x] do
+		y = box[:min_y]
+
+		line_space = bound_height * 1.0 / (n2 - 1)
+
+		while y < box[:max_y] do
+			fill_color color
+			fill_circle [x, y], weight
+			p "dot [#{x}, #{y}]" if debug
+			y += line_space
+		end
+
+		fill_color color
+		fill_circle [x, box[:max_y]], weight
+		p "dot [#{x}, #{box[:max_y]}]" if debug
+
+		if grow and bound_height * 1.0 / (n1 + n2 - 1) < space then
+			grow = false
+		elsif !grow and n1 == min_n1 then
+			grow = true
+		end
+
+		if grow then
+			t = n1
+			n1 = n2
+			n2 = n1 + t
+		else
+			t = n2
+			n2 = n1
+			n1 = t - n2
+		end
+		x += space
+	end
+end
 def n_up_horizontal_rule(file_name, horizontal = 1, vertical = 2, page_width = 612, page_height = 792, margin = 72/4, pages = 1, line_width = 0.75, space = 13.5, color = "DDDDDD", debug = false) 
 	n_up file_name, page_width, page_height, margin, pages, horizontal, vertical, line_width, space, color, :draw_horizontal_rule, debug
 end
@@ -189,6 +259,10 @@ def n_up_horizontal_fib_dots(file_name, horizontal = 1, vertical = 2, page_width
 	n_up file_name, page_width, page_height, margin, pages, horizontal, vertical, radius, space, color, :draw_horizontal_fib_dots, debug
 end
 
+def n_up_vertical_fib_dots(file_name, horizontal = 1, vertical = 2, page_width = 612, page_height = 792, margin = 72/4, pages = 1, radius = 0.75, space = 13.5, color = "222222", debug = false) 
+	n_up file_name, page_width, page_height, margin, pages, horizontal, vertical, radius, space, color, :draw_vertical_fib_dots, debug
+end
+
 n_up_dots "2updots.pdf"
 n_up_horizontal_rule "2uphlines.pdf"
 n_up_dots "4updots.pdf", 2, 2
@@ -197,3 +271,4 @@ n_up_grid "2upgrid.pdf"
 n_up_horizontal_tri_dots "2uphtridots.pdf"
 n_up_vertical_tri_dots "2upvtridots.pdf"
 n_up_horizontal_fib_dots "2uphfibdots.pdf"
+n_up_vertical_fib_dots "2upvfibdots.pdf"

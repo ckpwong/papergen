@@ -67,8 +67,40 @@ def draw_horizontal_rule (box, color, weight, space, debug = false)
 	end
 end
 
+def draw_vertical_rule (box, color, weight, space, debug = false)
+	x = box[:min_x]
+	while x <= box[:max_x] do
+		stroke_color color
+		stroke do
+			line [x, box[:min_y]], [x, box[:max_y]]
+			p "vertical line: [#{x}, #{box[:min_y]}] -> [#{x}, #{box[:max_y]}]" if debug
+		end
+		x += space
+	end
+end
+
+
+def draw_grid (box, color, weight, space, debug = false)
+	# redefining box size to make sure all sides are closed, and use horizontal_rule and vertical_rule to actually draw the lines
+	b = Hash.new
+	b[:min_x] = box[:min_x]
+	b[:min_y] = box[:min_y]
+	b[:max_x] = ((box[:max_x] - box[:min_x]) / space).floor * space + box[:min_x]
+	b[:max_y] = ((box[:max_y] - box[:min_y]) / space).floor * space + box[:min_y]
+	draw_horizontal_rule b, color, weight, space, debug
+	draw_vertical_rule b, color, weight, space, debug
+end
+
 def n_up_horizontal_rule(file_name, horizontal = 1, vertical = 2, page_width = 612, page_height = 792, margin = 72/4, pages = 1, line_width = 0.75, space = 13.5, color = "DDDDDD", debug = false) 
 	n_up file_name, page_width, page_height, margin, pages, horizontal, vertical, line_width, space, color, :draw_horizontal_rule, debug
+end
+
+def n_up_vertical_rule(file_name, horizontal = 1, vertical = 2, page_width = 612, page_height = 792, margin = 72/4, pages = 1, line_width = 0.75, space = 13.5, color = "DDDDDD", debug = false) 
+	n_up file_name, page_width, page_height, margin, pages, horizontal, vertical, line_width, space, color, :draw_vertical_rule, debug
+end
+
+def n_up_grid(file_name, horizontal = 1, vertical = 2, page_width = 612, page_height = 792, margin = 72/4, pages = 1, radius = 0.75, space = 13.5, color = "DDDDDD", debug = false) 
+	n_up file_name, page_width, page_height, margin, pages, horizontal, vertical, radius, space, color, :draw_grid, debug
 end
 
 def n_up_dots(file_name, horizontal = 1, vertical = 2, page_width = 612, page_height = 792, margin = 72/4, pages = 1, radius = 0.75, space = 13.5, color = "DDDDDD", debug = false) 
@@ -78,3 +110,5 @@ end
 n_up_dots "2updots.pdf"
 n_up_horizontal_rule "2uphlines.pdf"
 n_up_dots "4updots.pdf", 2, 2
+n_up_vertical_rule "2upvlines.pdf"
+n_up_grid "2upgrid.pdf"

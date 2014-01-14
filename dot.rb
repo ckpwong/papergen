@@ -130,6 +130,37 @@ def draw_horizontal_tri_dots (box, color, weight, space, debug = false)
 	end
 end
 
+# generate dots in periods
+def draw_horizontal_fib_dots (box, color, weight, space, debug = false)
+	n1 = 0
+	n2 = 1
+	bound_width = box[:max_x] - box[:min_x]
+
+	y = box[:min_y]
+	while y <= box[:max_y] do
+		x = 0
+
+		do
+			line_space = bound_width / n2
+			if line_space < space then
+				n1 = 0
+				n2 = 1
+			end
+		end
+
+		while x <= box[:max_x] do
+			fill_color color
+			fill_circle [x, y], weight
+			p "dot [#{x}, #{y}]" if debug
+			x += line_space
+		end
+		t = n1
+		n1 = n2
+		n2 = n1 + t
+		y += space
+	end
+end
+
 def n_up_horizontal_rule(file_name, horizontal = 1, vertical = 2, page_width = 612, page_height = 792, margin = 72/4, pages = 1, line_width = 0.75, space = 13.5, color = "DDDDDD", debug = false) 
 	n_up file_name, page_width, page_height, margin, pages, horizontal, vertical, line_width, space, color, :draw_horizontal_rule, debug
 end
@@ -154,6 +185,10 @@ def n_up_horizontal_tri_dots(file_name, horizontal = 1, vertical = 2, page_width
 	n_up file_name, page_width, page_height, margin, pages, horizontal, vertical, radius, space, color, :draw_horizontal_tri_dots, debug
 end
 
+def n_up_horizontal_fib_dots(file_name, horizontal = 1, vertical = 2, page_width = 612, page_height = 792, margin = 72/4, pages = 1, radius = 0.75, space = 13.5, color = "222222", debug = false) 
+	n_up file_name, page_width, page_height, margin, pages, horizontal, vertical, radius, space, color, :draw_horizontal_fib_dots, debug
+end
+
 n_up_dots "2updots.pdf"
 n_up_horizontal_rule "2uphlines.pdf"
 n_up_dots "4updots.pdf", 2, 2
@@ -161,3 +196,4 @@ n_up_vertical_rule "2upvlines.pdf"
 n_up_grid "2upgrid.pdf"
 n_up_horizontal_tri_dots "2uphtridots.pdf"
 n_up_vertical_tri_dots "2upvtridots.pdf"
+n_up_horizontal_fib_dots "2uphfibdots.pdf"

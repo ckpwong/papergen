@@ -2,8 +2,22 @@
 
 require 'prawn'
 
-# generalized
+
+# generalized n-up
 def n_up(file_name, page_width, page_height, margin, pages, horizontal, vertical, weight, space, color, draw_func, debug = false) 
+	boxes = calculate_boxes page_width, page_height, margin, horizontal, vertical, debug
+
+	Prawn::Document.generate(file_name, :page_size => [page_width, page_height], :margin => margin) do
+		for p in (1 .. pages) do
+			for b in boxes do
+				send draw_func, b, color, weight, space, debug
+			end
+			start_new_page unless p == pages
+		end
+	end
+end
+
+def calculate_boxes(page_width, page_height, margin, horizontal, vertical, debug = false)
 	box_width = page_width / horizontal
 	box_height = page_height / vertical
 	bound_width = box_width - 2 * margin
@@ -26,19 +40,10 @@ def n_up(file_name, page_width, page_height, margin, pages, horizontal, vertical
 				:min_y => min_y,
 				:max_y => max_y
 			} )
-
-
 		end
 	end
 
-	Prawn::Document.generate(file_name, :page_size => [page_width, page_height], :margin => margin) do
-		for p in (1 .. pages) do
-			for b in boxes do
-				send draw_func, b, color, weight, space, debug
-			end
-			start_new_page unless p == pages
-		end
-	end
+	return boxes
 end
 
 def draw_dots (box, color, weight, space, debug = false)
@@ -124,6 +129,7 @@ def draw_horizontal_tri_dots (box, color, weight, space, debug = false)
 		y += h_space
 	end
 end
+
 def n_up_horizontal_rule(file_name, horizontal = 1, vertical = 2, page_width = 612, page_height = 792, margin = 72/4, pages = 1, line_width = 0.75, space = 13.5, color = "DDDDDD", debug = false) 
 	n_up file_name, page_width, page_height, margin, pages, horizontal, vertical, line_width, space, color, :draw_horizontal_rule, debug
 end

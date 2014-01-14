@@ -13,6 +13,8 @@ Prawn::Document.generate("dot.pdf") do
 		while y <= (792 - 72) do
 			fill_color "AAAAAA"
 			fill_circle [x, y], 1
+			y += 5
 		end
+		x += 5
 	end
 end

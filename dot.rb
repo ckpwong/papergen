@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'prawn'
+require 'getoptlong'
 
 
 # generalized n-up
@@ -12,7 +13,7 @@ def n_up(file_name, opts = {})
 		:page_height => 792, 
 		:margin => 72/4, 
 		:pages => 1, 
-		:weight => 0.75, 
+		:weight => 0.5, 
 		:space => 13.5, 
 		:colour => "222222", 
 		:debug => false }.merge(opts)
@@ -244,61 +245,205 @@ def draw_vertical_fib_dots (box, opts = {})
 		x += opts[:space]
 	end
 end
-def n_up_horizontal_rule(file_name, opts = {})
-	opts[:draw_method] = :draw_horizontal_rule
-	opts[:weight] = opts[:line_width] if opts.has_key? :line_width
-	n_up file_name, opts
+# def n_up_horizontal_rule(file_name, opts = {})
+# 	opts[:draw_method] = :draw_horizontal_rule
+# 	opts[:weight] = opts[:line_width] if opts.has_key? :line_width
+# 	n_up file_name, opts
+# end
+
+# def n_up_vertical_rule(file_name, opts = {})
+# 	opts[:draw_method] = :draw_vertical_rule
+# 	opts[:weight] = opts[:line_width] if opts.has_key? :line_width
+# 	n_up file_name, opts
+# end
+
+# def n_up_grid(file_name, opts = {})
+# 	opts[:draw_method] = :draw_grid
+# 	opts[:weight] = opts[:line_width] if opts.has_key? :line_width
+# 	n_up file_name, opts
+# end
+
+# def n_up_dots(file_name, opts = {})
+# 	opts[:draw_method] = :draw_dots
+# 	opts[:weight] = opts[:radius] if opts.has_key? :radius
+# 	n_up file_name, opts
+# end
+
+# def n_up_vertical_tri_dots(file_name, opts = {})
+# 	opts[:draw_method] = :draw_vertical_tri_dots
+# 	opts[:weight] = opts[:radius] if opts.has_key? :radius
+# 	n_up file_name, opts
+# end
+
+# def n_up_horizontal_tri_dots(file_name, opts = {})
+# 	opts[:draw_method] = :draw_horizontal_tri_dots
+# 	opts[:weight] = opts[:radius] if opts.has_key? :radius
+# 	n_up file_name, opts
+# end
+
+# def n_up_horizontal_fib_dots(file_name, opts = {})
+# 	opts[:draw_method] = :draw_horizontal_fib_dots
+# 	opts[:weight] = opts[:radius] if opts.has_key? :radius
+# 	n_up file_name, opts
+
+# end
+
+# def n_up_vertical_fib_dots(file_name, opts = { } )
+# 	opts[:draw_method] = :draw_vertical_fib_dots
+# 	opts[:weight] = opts[:radius] if opts.has_key? :radius
+# 	n_up file_name, opts
+# end
+
+def print_help ( errmsg = "" )
+	if !errmsg.nil? and !errmsg.to_s.empty?
+		puts "Error: #{errmsg}\n\n"
+	end
+
+	puts <<-EOF
+
+dot.rb [OPTION] ... FILENAME
+
+-h, --help:
+	Show help.
+
+-r, --rows:
+	Number of rows to split the page into.  Default is 1.
+
+-l, --columns:
+	Number of columns to split the page into.  Default is 2.
+
+-n, --numpages:
+	Number of pages to create.  Default is 1.
+
+-w, --weight:
+	The size, in pt (1/72"), should each dot/line be drawn.  Default is 0.5.
+
+-s, --spacing:
+	How far apart, in pt (1/72"), should the dots/lines be apart.  Default is 13.5.
+
+-c, --colour:
+	The colour, in hex RGB value, of the dots/lines to be drawn.  Default is "DDDDDD".
+
+-t, --type:
+	The type of paper to be drawn.  Here are the supported types:
+
+		dots 		Dots in a square grid pattern
+		hrule 		Horizontally ruled
+		vrule 		Vertically ruled
+		grid 		Square grid
+		htridots 	Dots in a horizontally-aligned triangle grid pattern 
+		vtridots 	Dots in a vertically-aligned triangle grid pattern 
+		hfibdots 	Horizontally-aligned dots in Fibonacci sequence (EXPERMENTAL)
+		vfibdots 	Vertically-aligned dots in Fibonacci sequence (EXPERMENTAL)
+
+	Default is "dots"
+
+--pagewidth:
+	The page width in pt (1/72").
+
+--pageheight:
+	The page height in pt (1/72").
+
+-v, --verbose:
+	Turn on debug messages.
+	
+EOF
+
 end
 
-def n_up_vertical_rule(file_name, opts = {})
-	opts[:draw_method] = :draw_vertical_rule
-	opts[:weight] = opts[:line_width] if opts.has_key? :line_width
-	n_up file_name, opts
+
+opts = GetoptLong.new(
+	[ '--help', '-h', GetoptLong::NO_ARGUMENT ],
+	[ '--margin', '-m', GetoptLong::REQUIRED_ARGUMENT ],
+	[ '--rows', '-r', GetoptLong::REQUIRED_ARGUMENT ],
+	[ '--columns',  '-l', GetoptLong::REQUIRED_ARGUMENT ],
+	[ '--pagewidth',  GetoptLong::REQUIRED_ARGUMENT ],
+	[ '--pageheight', GetoptLong::REQUIRED_ARGUMENT ],
+	[ '--numpages', '-n', GetoptLong::REQUIRED_ARGUMENT ],
+	[ '--weight', '-w', GetoptLong::REQUIRED_ARGUMENT ],
+	[ '--spacing', '-s', GetoptLong::REQUIRED_ARGUMENT ],
+	[ '--colour', '--color', '-c', GetoptLong::REQUIRED_ARGUMENT],
+	[ '--type', '-t', GetoptLong::REQUIRED_ARGUMENT],
+	[ '--verbose', '-v', GetoptLong::NO_ARGUMENT ]
+)
+
+o = {
+	:horizontal => 1, 
+	:vertical => 2, 
+	:page_width => 612, 
+	:page_height => 792, 
+	:margin => 72/4, 
+	:pages => 1, 
+	:weight => 0.5, 
+	:space => 13.5, 
+	:colour => "DDDDDD", 
+	:debug => false,
+	:draw_method => :draw_dots }
+
+opts.each do |opt, arg|
+	case opt
+	when '--help'
+		print_help
+		exit 0
+	when '--margin'
+		o[:margin] = arg.to_i
+	when '--rows'
+		o[:horizontal] = arg.to_i
+	when '--columns'
+		o[:vertical] = arg.to_i
+	when '--pagewidth'
+		o[:page_width] = arg.to_i
+	when '--pageheight'
+		o[:page_height] = arg.to_i
+	when '--numpages'
+		o[:pages] = arg.to_i
+	when '--weight'
+		o[:weight] = arg.to_i
+	when '--spacing'
+		o[:space] = arg.to_i
+	when '--colour'
+		if arg.to_s =~ /^[0-9a-fA-F]{6}$/
+			o[:colour] = arg.to_s
+		else
+			print_help "Colour must be specified in Hex RGB value"
+			exit 0
+		end
+	when '--type'
+		case arg
+		when 'dots'
+			o[:draw_method] = :draw_dots
+		when 'hrule'
+			o[:draw_method] = :draw_horizontal_rule
+		when 'vrule'
+			o[:draw_method] = :draw_vertical_rule
+		when 'grid'
+			o[:draw_method] = :draw_grid
+		when 'htridots'
+			o[:draw_method] = :draw_horizontal_tri_dots
+		when 'vtridots'
+			o[:draw_method] = :draw_vertical_tri_dots
+		when 'hfibdots'
+			o[:draw_method] = :draw_horizontal_fib_dots
+		when 'vfibdots'
+			o[:draw_method] = :draw_vertical_fib_dots
+		else
+			print_help "Unrecognized type \"#{arg}\""
+			exit 0
+		end
+
+	when '--verbose'
+		o[:debug] = true
+	else
+		print_help "Unrecognized option \"#{opt}\""
+		exit 0
+	end
 end
 
-def n_up_grid(file_name, opts = {})
-	opts[:draw_method] = :draw_grid
-	opts[:weight] = opts[:line_width] if opts.has_key? :line_width
-	n_up file_name, opts
+if ARGV.length != 1
+	print_help "Missing filename argument"
+	exit 0
 end
 
-def n_up_dots(file_name, opts = {})
-	opts[:draw_method] = :draw_dots
-	opts[:weight] = opts[:radius] if opts.has_key? :radius
-	n_up file_name, opts
-end
+file_name = ARGV.shift
 
-def n_up_vertical_tri_dots(file_name, opts = {})
-	opts[:draw_method] = :draw_vertical_tri_dots
-	opts[:weight] = opts[:radius] if opts.has_key? :radius
-	n_up file_name, opts
-end
-
-def n_up_horizontal_tri_dots(file_name, opts = {})
-	opts[:draw_method] = :draw_horizontal_tri_dots
-	opts[:weight] = opts[:radius] if opts.has_key? :radius
-	n_up file_name, opts
-end
-
-def n_up_horizontal_fib_dots(file_name, opts = {})
-	opts[:draw_method] = :draw_horizontal_fib_dots
-	opts[:weight] = opts[:radius] if opts.has_key? :radius
-	n_up file_name, opts
-
-end
-
-def n_up_vertical_fib_dots(file_name, opts = { } )
-	opts[:draw_method] = :draw_vertical_fib_dots
-	opts[:weight] = opts[:radius] if opts.has_key? :radius
-	n_up file_name, opts
-end
-
-n_up_dots "2updots.pdf"
-n_up_horizontal_rule "2uphlines.pdf"
-n_up_dots "4updots.pdf", :horizontal => 2
-n_up_vertical_rule "2upvlines.pdf"
-n_up_grid "2upgrid.pdf"
-n_up_horizontal_tri_dots "2uphtridots.pdf"
-n_up_vertical_tri_dots "2upvtridots.pdf"
-n_up_horizontal_fib_dots "2uphfibdots.pdf"
-n_up_vertical_fib_dots "2upvfibdots.pdf"
+n_up file_name, o

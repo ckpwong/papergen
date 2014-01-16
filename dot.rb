@@ -245,54 +245,6 @@ def draw_vertical_fib_dots (box, opts = {})
 		x += opts[:space]
 	end
 end
-# def n_up_horizontal_rule(file_name, opts = {})
-# 	opts[:draw_method] = :draw_horizontal_rule
-# 	opts[:weight] = opts[:line_width] if opts.has_key? :line_width
-# 	n_up file_name, opts
-# end
-
-# def n_up_vertical_rule(file_name, opts = {})
-# 	opts[:draw_method] = :draw_vertical_rule
-# 	opts[:weight] = opts[:line_width] if opts.has_key? :line_width
-# 	n_up file_name, opts
-# end
-
-# def n_up_grid(file_name, opts = {})
-# 	opts[:draw_method] = :draw_grid
-# 	opts[:weight] = opts[:line_width] if opts.has_key? :line_width
-# 	n_up file_name, opts
-# end
-
-# def n_up_dots(file_name, opts = {})
-# 	opts[:draw_method] = :draw_dots
-# 	opts[:weight] = opts[:radius] if opts.has_key? :radius
-# 	n_up file_name, opts
-# end
-
-# def n_up_vertical_tri_dots(file_name, opts = {})
-# 	opts[:draw_method] = :draw_vertical_tri_dots
-# 	opts[:weight] = opts[:radius] if opts.has_key? :radius
-# 	n_up file_name, opts
-# end
-
-# def n_up_horizontal_tri_dots(file_name, opts = {})
-# 	opts[:draw_method] = :draw_horizontal_tri_dots
-# 	opts[:weight] = opts[:radius] if opts.has_key? :radius
-# 	n_up file_name, opts
-# end
-
-# def n_up_horizontal_fib_dots(file_name, opts = {})
-# 	opts[:draw_method] = :draw_horizontal_fib_dots
-# 	opts[:weight] = opts[:radius] if opts.has_key? :radius
-# 	n_up file_name, opts
-
-# end
-
-# def n_up_vertical_fib_dots(file_name, opts = { } )
-# 	opts[:draw_method] = :draw_vertical_fib_dots
-# 	opts[:weight] = opts[:radius] if opts.has_key? :radius
-# 	n_up file_name, opts
-# end
 
 def print_help ( errmsg = "" )
 	if !errmsg.nil? and !errmsg.to_s.empty?
@@ -346,7 +298,7 @@ dot.rb [OPTION] ... FILENAME
 
 -v, --verbose:
 	Turn on debug messages.
-	
+
 EOF
 
 end
